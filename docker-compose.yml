@@ -1,0 +1,41 @@
+version: "3.7"
+
+volumes:
+  app_db_volume_local: {}
+
+  
+services:
+  app_db:
+    restart: always
+    image: postgres:15.4
+    volumes:
+      - app_db_volume_local:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: app_db
+      POSTGRES_PASSWORD: 211e7f2a3e2574850de346b12f92e64f
+      POSTGRES_DB: app_db
+    ports:
+      - 5435:5432
+
+  app_web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - app_db
+    ports:
+      - 8002:8000
+    command: >
+      bash -c "./manage.py migrate  && gunicorn -b 0.0.0.0:8000 pilot_project.wsgi:application"
+    volumes:
+      - .:/pilot_project
+  nginx:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./docker/nginx/
+    container_name: nginx
+    depends_on:
+      - app_web
+    ports:
+      - 3091:80
+
