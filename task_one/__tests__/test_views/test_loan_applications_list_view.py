@@ -2,10 +2,13 @@ from pilot_project.settings import PAGE_SIZE
 import pytest
 from django.urls import reverse
 from django.test import Client
+
 pytestmark = pytest.mark.django_db
+
 
 class TestLoanApplicationsListView:
     URL = 'loan_applications_list'
+
     def test_get(self, client: Client, create_10_loadn_applications: None):
         url = reverse(self.URL)
         response = client.get(url, content_type='application/json')
